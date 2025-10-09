@@ -1,6 +1,6 @@
 package com.ims.inventorymanagementsystem.controllers;
 
-import com.ims.inventorymanagementsystem.dto.ProductDTO;
+import com.ims.inventorymanagementsystem.dtos.ProductDTO;
 import com.ims.inventorymanagementsystem.entities.Product;
 import com.ims.inventorymanagementsystem.service.ProductService;
 import jakarta.validation.Valid;
