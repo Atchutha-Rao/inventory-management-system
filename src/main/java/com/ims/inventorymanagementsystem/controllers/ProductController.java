@@ -29,7 +29,6 @@ public class ProductController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // optional categoryId query param to associate product to category
     @PostMapping
     public ResponseEntity<Product> create(@RequestBody Product product, @RequestParam(required = false) Integer categoryId) {
         Product saved = productService.create(product, categoryId);
