@@ -26,6 +26,5 @@ public class Category {
     @NotBlank(message = "Name is required")
     private String name;
 
-    @OneToMany(mappedBy = "user")
-    private List<Transaction> transactions;
+
 }
