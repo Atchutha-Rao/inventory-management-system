@@ -2,14 +2,9 @@ package com.ims.inventorymanagementsystem.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ims.inventorymanagementsystem.entities.Product;
-import com.ims.inventorymanagementsystem.entities.Supplier;
-import com.ims.inventorymanagementsystem.entities.User;
 import com.ims.inventorymanagementsystem.enums.TransactionStatus;
 import com.ims.inventorymanagementsystem.enums.TransactionType;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -35,8 +30,6 @@ public class TransactionDTO {
     private LocalDateTime updatedAt;
 
     private ProductDTO product;
-
     private UserDTO user;
-
     private SupplierDTO supplier;
 }
