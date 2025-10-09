@@ -32,7 +32,7 @@ public class User {
     @NotBlank(message = "Phone Number cannot be empty")
     private long phoneNumber;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Transaction> transactions;
     private final LocalDateTime created = LocalDateTime.now();
 
