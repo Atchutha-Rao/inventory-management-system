@@ -1,6 +1,7 @@
 package com.ims.inventorymanagementsystem.exceptions;
 //import com.ims.inventorymanagementsystem.payload.Response;
-import org.apache.coyote.Response;
+
+import com.ims.inventorymanagementsystem.dtos.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
