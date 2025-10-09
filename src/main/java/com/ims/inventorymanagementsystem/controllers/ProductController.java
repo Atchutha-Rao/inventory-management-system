@@ -1,12 +1,15 @@
 package com.ims.inventorymanagementsystem.controllers;
 
+import com.ims.inventorymanagementsystem.dto.ProductDTO;
 import com.ims.inventorymanagementsystem.entities.Product;
 import com.ims.inventorymanagementsystem.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -18,26 +21,30 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> list() {
-        return productService.getAll();
+    public List<ProductDTO> list() {
+        return productService.getAll().stream().map(ProductDTO::fromEntity).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> get(@PathVariable long id) {
+    public ResponseEntity<ProductDTO> get(@PathVariable long id) {
         return productService.getById(id)
+                .map(ProductDTO::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Product> create(@RequestBody Product product, @RequestParam(required = false) Integer categoryId) {
-        Product saved = productService.create(product, categoryId);
-        return ResponseEntity.created(URI.create("/api/products/" + saved.getId())).body(saved);
+    public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO productDto, @RequestParam(required = false) Integer categoryId) {
+        Product entity = productDto.toEntity();
+        Product saved = productService.create(entity, categoryId);
+        return ResponseEntity.created(URI.create("/api/products/" + saved.getId())).body(ProductDTO.fromEntity(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable long id, @RequestBody Product product, @RequestParam(required = false) Integer categoryId) {
-        return productService.update(id, product, categoryId)
+    public ResponseEntity<ProductDTO> update(@PathVariable long id, @Valid @RequestBody ProductDTO productDto, @RequestParam(required = false) Integer categoryId) {
+        Product entity = productDto.toEntity();
+        return productService.update(id, entity, categoryId)
+                .map(ProductDTO::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
