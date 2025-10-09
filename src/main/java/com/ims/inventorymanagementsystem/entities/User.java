@@ -1,4 +1,4 @@
-package com.ims.inventorymanagementsystem;
+package com.ims.inventorymanagementsystem.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,4 +20,5 @@ public class User {
     private String password;
     private String email;
     private long phoneNumber;
+
 }
