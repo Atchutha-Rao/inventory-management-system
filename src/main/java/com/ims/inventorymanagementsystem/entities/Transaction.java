@@ -18,4 +18,5 @@ public class Transaction {
     private long id;
     private int totalProducts;
     private double totalPrice;
+
 }
