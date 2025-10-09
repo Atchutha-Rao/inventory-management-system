@@ -16,13 +16,13 @@ import lombok.NoArgsConstructor;
 public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long supplierId;
+    private Long id;
     @NotBlank(message = "Name is required")
-    private String supplierName;
+    private String name;
     @NotBlank(message = " supplierContactInfo is required")
-    private String supplierContactInfo;
+    private String contactInfo;
     @NotBlank(message = "supplierAddress is required")
-    private String supplierAddress;
+    private String address;
 
 
 
