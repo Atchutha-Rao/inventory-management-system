@@ -1,4 +1,9 @@
 package com.ims.inventorymanagementsystem.repositories;
 
-public interface UserRepo {
+
+import com.ims.inventorymanagementsystem.entities.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepo extends JpaRepository<User, Long> {
+
 }
