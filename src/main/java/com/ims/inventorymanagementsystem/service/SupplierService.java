@@ -36,9 +36,9 @@ public class SupplierService {
         Supplier existingSupplier = supplierRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Supplier Not Found"));
 
-        if (supplierDTO.getSupplierName() != null) existingSupplier.setName(supplierDTO.getSupplierName());
-        if (supplierDTO.getSupplierContactInfo() != null) existingSupplier.setContactInfo(supplierDTO.getSupplierContactInfo());
-        if (supplierDTO.getSupplierAddress() != null) existingSupplier.setAddress(supplierDTO.getSupplierAddress());
+        if (supplierDTO.getName() != null) existingSupplier.setName(supplierDTO.getName());
+        if (supplierDTO.getContactInfo() != null) existingSupplier.setContactInfo(supplierDTO.getContactInfo());
+        if (supplierDTO.getAddress() != null) existingSupplier.setAddress(supplierDTO.getAddress());
 
         supplierRepository.save(existingSupplier);
 

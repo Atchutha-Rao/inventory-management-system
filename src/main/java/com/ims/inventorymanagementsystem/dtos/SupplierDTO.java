@@ -3,22 +3,24 @@ package com.ims.inventorymanagementsystem.dtos;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Getter
-@Setter
 public class SupplierDTO {
+
     private Long id;
 
     @NotBlank(message = "Name is required")
-    private String supplierName;
-    @NotBlank(message = "supplierContactInfo is required")
-    private String supplierContactInfo;
-    private String supplierAddress;
+    private String name;
 
+    @NotBlank(message = " contactInfo is required")
+    private String contactInfo;
+
+    private String address;
 }

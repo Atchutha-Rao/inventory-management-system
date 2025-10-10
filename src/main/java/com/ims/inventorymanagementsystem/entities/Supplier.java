@@ -10,20 +10,19 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="suppliers")
+@Table(name = "suppliers")
 @Data
 @Builder
 public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotBlank(message = "Name is required")
     private String name;
-    @NotBlank(message = " supplierContactInfo is required")
+
+    @NotBlank(message = " contactInfo is required")
     private String contactInfo;
-    @NotBlank(message = "supplierAddress is required")
+
     private String address;
-
-
-
 }

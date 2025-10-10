@@ -92,12 +92,8 @@ public class TransactionService {
 
         User user = userService.getCurrentLoggedInUser();
 
-        //update the stock quantity and re-save
         product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
-
-
-        //create a transaction
         Transaction transaction = Transaction.builder()
                 .transactionType(TransactionType.SALE)
                 .transactionStatus(TransactionStatus.COMPLETED)
@@ -134,7 +130,6 @@ public class TransactionService {
 
         User user = userService.getCurrentLoggedInUser();
 
-        //update the stock quantity and re-save
         product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
 
