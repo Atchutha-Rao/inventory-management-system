@@ -1,21 +1,19 @@
 package com.ims.inventorymanagementsystem.entities;
 
+import com.ims.inventorymanagementsystem.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Builder
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,10 +28,26 @@ public class User {
     private String email;
 
     @NotBlank(message = "Phone Number cannot be empty")
-    private long phoneNumber;
+    private String phoneNumber;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     @OneToMany(mappedBy = "user")
     private List<Transaction> transactions;
+
     private final LocalDateTime created = LocalDateTime.now();
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber=" + phoneNumber +
+                ", role=" + role +
+                ", created=" + created +
+                '}';
+    }
 }

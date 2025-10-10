@@ -33,7 +33,6 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
 
-    @Override
     public Response registerUser(RegisterRequest registerRequest) {
 
         UserRole role = UserRole.MANAGER;
@@ -43,7 +42,7 @@ public class UserService {
         }
 
         User userToSave = User.builder()
-                .name(registerRequest.getName())
+                .username(registerRequest.getName())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .phoneNumber(registerRequest.getPhoneNumber())
@@ -58,7 +57,6 @@ public class UserService {
                 .build();
     }
 
-    @Override
     public Response loginUser(LoginRequest loginRequest) {
 
         User user = userRepository.findByEmail(loginRequest.getEmail())
@@ -78,7 +76,6 @@ public class UserService {
                 .build();
     }
 
-    @Override
     public Response getAllUsers() {
 
         List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
@@ -95,7 +92,6 @@ public class UserService {
                 .build();
     }
 
-    @Override
     public User getCurrentLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -108,7 +104,6 @@ public class UserService {
         return user;
     }
 
-    @Override
     public Response getUserById(Long id) {
 
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
@@ -124,7 +119,6 @@ public class UserService {
                 .build();
     }
 
-    @Override
     public Response updateUser(Long id, UserDTO userDTO) {
 
         User existingUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
@@ -145,7 +139,6 @@ public class UserService {
                 .build();
     }
 
-    @Override
     public Response deleteUser(Long id) {
         userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
 
@@ -158,7 +151,6 @@ public class UserService {
 
     }
 
-    @Override
     public Response getUserTransactions(Long id) {
 
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User Not Found"));
