@@ -1,10 +1,11 @@
 package com.ims.inventorymanagementsystem.exceptions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ims.inventorymanagementsystem.dtos.Response;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.ws.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
