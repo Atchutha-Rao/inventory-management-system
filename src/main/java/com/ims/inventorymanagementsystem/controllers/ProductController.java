@@ -1,57 +1,92 @@
 package com.ims.inventorymanagementsystem.controllers;
 
 import com.ims.inventorymanagementsystem.dtos.ProductDTO;
-import com.ims.inventorymanagementsystem.entities.Product;
+import com.ims.inventorymanagementsystem.dtos.Response;
 import com.ims.inventorymanagementsystem.service.ProductService;
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/products")
+@RequiredArgsConstructor
 public class ProductController {
+
     private final ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Response> saveProduct(
+            @RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam("name") String name,
+            @RequestParam("sku") String sku,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("stockQuantity") Integer stockQuantity,
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam(value = "description", required = false) String description
+    ) {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName(name);
+        productDTO.setSku(sku);
+        productDTO.setPrice(price);
+        productDTO.setStockQuantity(stockQuantity);
+        productDTO.setCategoryId(categoryId);
+        productDTO.setDescription(description);
+
+        return ResponseEntity.ok(productService.saveProduct(productDTO, imageFile));
+
     }
 
-    @GetMapping
-    public List<ProductDTO> list() {
-        return productService.getAll().stream().map(ProductDTO::fromEntity).collect(Collectors.toList());
+    @PutMapping("/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Response> updateProduct(
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "sku", required = false) String sku,
+            @RequestParam(value = "price", required = false) BigDecimal price,
+            @RequestParam(value = "stockQuantity", required = false) Integer stockQuantity,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam("productId") Long productId
+    ) {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName(name);
+        productDTO.setSku(sku);
+        productDTO.setPrice(price);
+        productDTO.setProductId(productId);
+        productDTO.setStockQuantity(stockQuantity);
+        productDTO.setCategoryId(categoryId);
+        productDTO.setDescription(description);
+
+        return ResponseEntity.ok(productService.updateProduct(productDTO, imageFile));
+
+    }
+
+
+    @GetMapping("/all")
+    public ResponseEntity<Response> getAllProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> get(@PathVariable long id) {
-        return productService.getById(id)
-                .map(ProductDTO::fromEntity)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Response> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO productDto, @RequestParam(required = false) Integer categoryId) {
-        Product entity = productDto.toEntity();
-        Product saved = productService.create(entity, categoryId);
-        return ResponseEntity.created(URI.create("/api/products/" + saved.getId())).body(ProductDTO.fromEntity(saved));
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Response> deleteProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.deleteProduct(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> update(@PathVariable long id, @Valid @RequestBody ProductDTO productDto, @RequestParam(required = false) Integer categoryId) {
-        Product entity = productDto.toEntity();
-        return productService.update(id, entity, categoryId)
-                .map(ProductDTO::fromEntity)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/search")
+    public ResponseEntity<Response> searchProduct(@RequestParam String input) {
+        return ResponseEntity.ok(productService.searchProduct(input));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable long id) {
-        productService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+
 }

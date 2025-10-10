@@ -1,59 +1,246 @@
 package com.ims.inventorymanagementsystem.service;
 
+import com.ims.inventorymanagementsystem.dtos.ProductDTO;
+import com.ims.inventorymanagementsystem.dtos.Response;
 import com.ims.inventorymanagementsystem.entities.Category;
 import com.ims.inventorymanagementsystem.entities.Product;
+import com.ims.inventorymanagementsystem.exceptions.NotFoundException;
 import com.ims.inventorymanagementsystem.repositories.CategoryRepo;
 import com.ims.inventorymanagementsystem.repositories.ProductRepo;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
-@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class ProductService {
-    private final ProductRepo productRepo;
-    private final CategoryRepo categoryRepo;
 
-    public ProductService(ProductRepo productRepo, CategoryRepo categoryRepo) {
-        this.productRepo = productRepo;
-        this.categoryRepo = categoryRepo;
-    }
+    private final ProductRepo productRepository;
+    private final ModelMapper modelMapper;
+    private final CategoryRepo categoryRepository;
 
-    public List<Product> getAll() {
-        return productRepo.findAll();
-    }
+    private static final String IMAGE_DIRECTORY = System.getProperty("user.dir") + "/product-images/";
 
-    public Optional<Product> getById(long id) {
-        return productRepo.findById(id);
-    }
+    //AFTER YOUR FRONTEND IS SETUP CHANGE THE IMAGE DIRECTORY TO YHE FRONTEND YOU ARE USING
+    private static final String IMAGE_DIRECTORY_2 = "/Users/dennismac/phegonDev/ims-react/public/products/";
 
-    public Product create(Product product, Integer categoryId) {
-        if (categoryId != null) {
-            Category cat = (Category) categoryRepo.findById(categoryId).orElse(null);
-            product.setCategory(cat);
+    public Response saveProduct(ProductDTO productDTO, MultipartFile imageFile) {
+
+        Category category = categoryRepository.findById(productDTO.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Category Not Found"));
+
+        //map our dto to product entity
+        Product productToSave = Product.builder()
+                .name(productDTO.getName())
+                .sku(productDTO.getSku())
+                .price(productDTO.getPrice())
+                .quantity(productDTO.getStockQuantity())
+                .description(productDTO.getDescription())
+                .category(category)
+                .build();
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            log.info("Image file exist");
+//            String imagePath = saveImage(imageFile); //use this when you haven't setup your frontend
+            String imagePath = saveImage2(imageFile); //use this when you ave set up your frontend locally but haven't deployed to produiction
+
+            System.out.println("IMAGE URL IS: " + imagePath);
+            productToSave.setImageUrl(imagePath);
         }
-        return productRepo.save(product);
+
+        //save the product entity
+        productRepository.save(productToSave);
+
+        return Response.builder()
+                .status(200)
+                .message("Product successfully saved")
+                .build();
     }
 
-    public Optional<Product> update(long id, Product updated, Integer categoryId) {
-        return productRepo.findById(id).map(existing -> {
-            existing.setName(updated.getName());
-            existing.setDescription(updated.getDescription());
-            existing.setPrice(updated.getPrice());
-            existing.setQuantity(updated.getQuantity());
-            if (categoryId != null) {
-                Object cat = categoryRepo.findById(categoryId).orElse(null);
+    public Response updateProduct(ProductDTO productDTO, MultipartFile imageFile) {
 
-                existing.setCategory((Category) cat);
-            }
-            return productRepo.save(existing);
-        });
+        //check if product exisit
+        Product existingProduct = productRepository.findById(productDTO.getProductId())
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+
+        //check if image is associated with the product to update and upload
+        if (imageFile != null && !imageFile.isEmpty()) {
+//            String imagePath = saveImage(imageFile); //use this when you haven't setup your frontend
+            String imagePath = saveImage2(imageFile); //use this when you ave set up your frontend locally but haven't deployed to produiction
+
+            System.out.println("IMAGE URL IS: " + imagePath);
+            existingProduct.setImageUrl(imagePath);
+        }
+
+        //check if category is to be chanegd for the products
+        if (productDTO.getCategoryId() != null && productDTO.getCategoryId() > 0) {
+            Category category = categoryRepository.findById(productDTO.getCategoryId())
+                    .orElseThrow(() -> new NotFoundException("Category Not Found"));
+            existingProduct.setCategory(category);
+        }
+
+        //check if product fields is to be changed and update
+        if (productDTO.getName() != null && !productDTO.getName().isBlank()) {
+            existingProduct.setName(productDTO.getName());
+        }
+
+        if (productDTO.getSku() != null && !productDTO.getSku().isBlank()) {
+            existingProduct.setSku(productDTO.getSku());
+        }
+
+        if (productDTO.getDescription() != null && !productDTO.getDescription().isBlank()) {
+            existingProduct.setDescription(productDTO.getDescription());
+        }
+
+        if (productDTO.getPrice() != null && productDTO.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
+            existingProduct.setPrice(productDTO.getPrice());
+        }
+
+        if (productDTO.getStockQuantity() != null && productDTO.getStockQuantity() >= 0) {
+            existingProduct.setQuantity(productDTO.getStockQuantity());
+        }
+        //update the product
+        productRepository.save(existingProduct);
+
+        //Build our response
+        return Response.builder()
+                .status(200)
+                .message("Product Updated successfully")
+                .build();
+
+
     }
 
-    public void delete(long id) {
+    public Response getAllProducts() {
 
-        productRepo.deleteById(id);
+        List<Product> productList = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+
+        List<ProductDTO> productDTOList = modelMapper.map(productList, new TypeToken<List<ProductDTO>>() {
+        }.getType());
+
+        return Response.builder()
+                .status(200)
+                .message("success")
+                .products(productDTOList)
+                .build();
+    }
+
+
+    public Response getProductById(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+
+        return Response.builder()
+                .status(200)
+                .message("success")
+                .product(modelMapper.map(product, ProductDTO.class))
+                .build();
+    }
+
+
+    public Response deleteProduct(Long id) {
+
+        productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product Not Found"));
+
+        productRepository.deleteById(id);
+
+        return Response.builder()
+                .status(200)
+                .message("Product Deleted successfully")
+                .build();
+    }
+
+
+    public Response searchProduct(String input) {
+
+        List<Product> products = productRepository.findByNameContainingOrDescriptionContaining(input, input);
+
+        if (products.isEmpty()) {
+            throw new NotFoundException("Product Not Found");
+        }
+
+        List<ProductDTO> productDTOList = modelMapper.map(products, new TypeToken<List<ProductDTO>>() {
+        }.getType());
+
+        return Response.builder()
+                .status(200)
+                .message("success")
+                .products(productDTOList)
+                .build();
+    }
+
+
+    //this save to the root of your project
+    private String saveImage(MultipartFile imageFile) {
+        //validate image and check if it is greater than 1GIB
+        if (!imageFile.getContentType().startsWith("image/") || imageFile.getSize() > 1024 * 1024 * 1024) {
+            throw new IllegalArgumentException("Only image files under 1GIG is allowed");
+        }
+
+        //create the directory if it doesn't exist
+        File directory = new File(IMAGE_DIRECTORY);
+
+        if (!directory.exists()) {
+            directory.mkdir();
+            log.info("Directory was created");
+        }
+        //generate unique file name for the image
+        String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+
+        //Get the absolute path of the image
+        String imagePath = IMAGE_DIRECTORY + uniqueFileName;
+
+        try {
+            File destinationFile = new File(imagePath);
+            imageFile.transferTo(destinationFile); //we are writing the image to this folder
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving Image: " + e.getMessage());
+        }
+        return imagePath;
+
+    }
+
+    //This saved image to the public folder in your frontend
+    //Use this if your have setup your frontend
+    private String saveImage2(MultipartFile imageFile) {
+        //validate image and check if it is greater than 1GIB
+        if (!imageFile.getContentType().startsWith("image/") || imageFile.getSize() > 1024 * 1024 * 1024) {
+            throw new IllegalArgumentException("Only image files under 1GIG is allowed");
+        }
+
+        //create the directory if it doesn't exist
+        File directory = new File(IMAGE_DIRECTORY_2);
+
+        if (!directory.exists()) {
+            directory.mkdir();
+            log.info("Directory was created");
+        }
+        //generate unique file name for the image
+        String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+
+        //Get the absolute path of the image
+        String imagePath = IMAGE_DIRECTORY_2 + uniqueFileName;
+
+        try {
+            File destinationFile = new File(imagePath);
+            imageFile.transferTo(destinationFile); //we are writing the image to this folder
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving Image: " + e.getMessage());
+        }
+        return "products/"+uniqueFileName;
+
+
     }
 }
