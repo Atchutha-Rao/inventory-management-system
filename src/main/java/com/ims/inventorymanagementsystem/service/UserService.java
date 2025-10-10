@@ -12,10 +12,10 @@ import com.ims.inventorymanagementsystem.repositories.UserRepo;
 import com.ims.inventorymanagementsystem.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -125,7 +125,7 @@ public class UserService {
 
         if (userDTO.getEmail() != null) existingUser.setEmail(userDTO.getEmail());
         if (userDTO.getPhoneNumber() != null) existingUser.setPhoneNumber(userDTO.getPhoneNumber());
-        if (userDTO.getName() != null) existingUser.setName(userDTO.getName());
+        if (userDTO.getUsername() != null) existingUser.setUsername(userDTO.getUsername());
         if (userDTO.getRole() != null) existingUser.setRole(userDTO.getRole());
 
         if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
