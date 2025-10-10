@@ -1,7 +1,7 @@
 package com.ims.inventorymanagementsystem.security;
 
-import com.phegondev.InventoryMgtSystem.exceptions.CustomAccessDenialHandler;
-import com.phegondev.InventoryMgtSystem.exceptions.CustomAuthenticationEntryPoint;
+import com.ims.inventorymanagementsystem.exceptions.CustomAccessDenialHandler;
+import com.ims.inventorymanagementsystem.exceptions.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
