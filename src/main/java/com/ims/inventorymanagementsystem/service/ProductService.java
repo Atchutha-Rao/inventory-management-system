@@ -34,7 +34,7 @@ public class ProductService {
     //AFTER YOUR FRONTEND IS SETUP CHANGE THE IMAGE DIRECTORY TO YHE FRONTEND YOU ARE USING
     private static final String IMAGE_DIRECTORY_2 = "/Users/dennismac/phegonDev/ims-react/public/products/";
 
-    public Response saveProduct(ProductDTO productDTO, MultipartFile imageFile) {
+    public Response saveProduct(ProductDTO productDTO) {
 
         Category category = categoryRepository.findById(productDTO.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category Not Found"));
@@ -67,7 +67,7 @@ public class ProductService {
                 .build();
     }
 
-    public Response updateProduct(ProductDTO productDTO, MultipartFile imageFile) {
+    public Response updateProduct(ProductDTO productDTO) {
 
         //check if product exisit
         Product existingProduct = productRepository.findById(productDTO.getProductId())

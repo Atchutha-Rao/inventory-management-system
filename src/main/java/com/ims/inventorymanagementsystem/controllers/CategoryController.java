@@ -45,6 +45,4 @@ public class CategoryController {
     public ResponseEntity<Response> deleteCategory(@PathVariable int id) {
         return ResponseEntity.ok(categoryService.deleteCategory(id));
     }
-
-
 }
