@@ -3,7 +3,7 @@ package com.ims.inventorymanagementsystem.controllers;
 import com.ims.inventorymanagementsystem.dtos.Response;
 import com.ims.inventorymanagementsystem.dtos.TransactionRequest;
 import com.ims.inventorymanagementsystem.enums.TransactionStatus;
-import com.ims.inventorymanagementsystem.services.TransactionService;
+import com.ims.inventorymanagementsystem.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
